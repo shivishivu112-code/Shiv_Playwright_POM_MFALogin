@@ -1,35 +1,39 @@
-import { Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { env } from '../config/env';
-import { locators } from '../locators/locators';
 import { RegistrationData } from '../utils/registrationData';
-import { BasePage } from './BasePage';
 
-const L = locators.registration;
+export class RegistrationPage {
+  constructor(private readonly page: Page) {}
 
-export class RegistrationPage extends BasePage {
-  get heading(): Locator { return this.loc(L.heading); }
-  get continueButton(): Locator { return this.loc(L.continueButton); }
-  get validationErrors(): Locator { return this.loc(L.validationErrors); }
-  get esignConsent(): Locator { return this.loc(L.esignConsent); }
-  get digitalServicesAgreement(): Locator { return this.loc(L.digitalServicesAgreement); }
+  get heading(): Locator { return this.page.getByRole('heading', { name: /create your credentials/i }); }
+  get continueButton(): Locator { return this.page.getByRole('button', { name: /^continue$/i }); }
+  get validationErrors(): Locator { return this.page.locator('[aria-invalid="true"], [role="alert"]'); }
+  get esignConsent(): Locator {
+    return this.page.getByRole('checkbox', {
+      name: /ESign Consent|Consent to Receive Information Electronically/i,
+    });
+  }
+  get digitalServicesAgreement(): Locator {
+    return this.page.getByRole('checkbox', { name: /Digital Services Agreement/i });
+  }
   /** The demo header shows this when its BFF is not running. */
-  get configWarning(): Locator { return this.loc(locators.app.configWarning); }
+  get configWarning(): Locator { return this.page.getByText(/configuration unavailable/i); }
 
   /** Opens the app and starts the registration journey. */
   async goto(): Promise<void> {
     await this.page.goto(env.registrationStartPath);
     if (env.useDemoNav) {
-      await this.loc(locators.nav.registration).click();
+      await this.page.getByRole('link', { name: 'Registration', exact: true }).click();
     }
     await this.heading.waitFor();
   }
 
   async fillForm(data: RegistrationData): Promise<void> {
-    await this.loc(L.username).fill(data.username);
-    await this.loc(L.password).fill(data.password);
-    await this.loc(L.retypePassword).fill(data.retypePassword ?? data.password);
-    await this.loc(L.givenName).fill(data.givenName);
-    await this.loc(L.familyName).fill(data.familyName);
+    await this.page.getByLabel(/^username/i).fill(data.username);
+    await this.page.getByLabel(/^password/i).fill(data.password);
+    await this.page.getByLabel(/re-?type password/i).fill(data.retypePassword ?? data.password);
+    await this.page.getByLabel(/given name/i).fill(data.givenName);
+    await this.page.getByLabel(/family name/i).fill(data.familyName);
 
     // setChecked is idempotent and also unchecks, so tests can pass acceptEsign:false
     await this.esignConsent.setChecked(data.acceptEsign ?? true);
@@ -51,6 +55,6 @@ export class RegistrationPage extends BasePage {
   }
 
   async backToLogin(): Promise<void> {
-    await this.loc(L.backToLogin).click();
+    await this.page.getByRole('link', { name: /back to login/i }).click();
   }
 }

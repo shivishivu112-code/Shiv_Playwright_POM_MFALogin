@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: ['.env.local', '.env'] });
 
 /** Reads a mandatory variable lazily, so `playwright test --list` works without a full .env. */
 function required(name: string): string {

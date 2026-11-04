@@ -1,14 +1,13 @@
-import { Locator } from '@playwright/test';
-import { locators } from '../locators/locators';
-import { BasePage } from './BasePage';
-
-const L = locators.app;
+import { Locator, Page } from '@playwright/test';
 
 /** The application the user lands on after a successful login. */
-export class AppPage extends BasePage {
-  get signedInMarker(): Locator { return this.loc(L.signedInMarker); }
+export class AppPage {
+  constructor(private readonly page: Page) {}
+
+  get signedInMarker(): Locator { 
+    return this.page.getByTestId('user-menu'); }
 
   async signOut(): Promise<void> {
-    await this.loc(L.signOut).click();
+    await this.page.getByRole('button', { name: /sign out|log out/i }).click();
   }
 }

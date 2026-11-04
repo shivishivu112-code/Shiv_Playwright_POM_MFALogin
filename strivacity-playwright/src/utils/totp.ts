@@ -18,7 +18,7 @@ export class TotpGenerator {
   constructor(base32Secret: string) {
     const clean = base32Secret.replace(/\s+/g, '').toUpperCase();
     if (!/^[A-Z2-7]+=*$/.test(clean)) {
-      throw new Error('TOTP secret is not valid base32. Check the locator for the enrollment secret.');
+      throw new Error('TOTP secret is not valid base32. Check MfaPage.totpSecret.');
     }
     this.totp = new OTPAuth.TOTP({
       secret: OTPAuth.Secret.fromBase32(clean),

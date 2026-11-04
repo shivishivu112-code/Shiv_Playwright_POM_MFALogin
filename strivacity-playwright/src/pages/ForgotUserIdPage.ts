@@ -1,14 +1,14 @@
-import { Locator } from '@playwright/test';
-import { locators } from '../locators/locators';
-import { BasePage } from './BasePage';
+import { Locator, Page } from '@playwright/test';
 
-const L = locators.forgotUserId;
+export class ForgotUserIdPage {
+  constructor(private readonly page: Page) {}
 
-export class ForgotUserIdPage extends BasePage {
-  get confirmation(): Locator { return this.loc(L.confirmation); }
+  get confirmation(): Locator {
+    return this.page.getByText(/check your (e-?mail|inbox)|we('ve| have) sent|instructions/i);
+  }
 
   async requestUserId(email: string): Promise<void> {
-    await this.loc(L.email).fill(email);
-    await this.loc(L.submit).click();
+    await this.page.getByRole('textbox', { name: /email/i }).fill(email);
+    await this.page.getByRole('button', { name: /send|continue|submit/i }).click();
   }
 }

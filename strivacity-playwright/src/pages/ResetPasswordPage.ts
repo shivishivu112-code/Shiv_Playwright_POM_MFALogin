@@ -1,13 +1,13 @@
-import { Locator } from '@playwright/test';
-import { locators } from '../locators/locators';
-import { BasePage } from './BasePage';
+import { Locator, Page } from '@playwright/test';
 
-const L = locators.resetPassword;
+export class ResetPasswordPage {
+  constructor(private readonly page: Page) {}
 
-export class ResetPasswordPage extends BasePage {
-  get success(): Locator { return this.loc(L.success); }
-  get errorMessage(): Locator { return this.loc(L.errorMessage); }
-  get invalidLink(): Locator { return this.loc(L.invalidLink); }
+  get success(): Locator {
+    return this.page.getByText(/password (has been |was )?(reset|changed|updated)|successfully/i);
+  }
+  get errorMessage(): Locator { return this.page.getByRole('alert'); }
+  get invalidLink(): Locator { return this.page.getByText(/invalid|expired|no longer valid/i); }
 
   /** Opens the link from the reset email. */
   async openLink(url: string): Promise<void> {
@@ -15,8 +15,8 @@ export class ResetPasswordPage extends BasePage {
   }
 
   async setPassword(password: string, confirmation = password): Promise<void> {
-    await this.loc(L.newPassword).fill(password);
-    await this.loc(L.confirmPassword).fill(confirmation);
-    await this.loc(L.submit).click();
+    await this.page.getByLabel(/^new password/i).fill(password);
+    await this.page.getByLabel(/confirm/i).fill(confirmation);
+    await this.page.getByRole('button', { name: /reset|save|change|continue|submit/i }).click();
   }
 }

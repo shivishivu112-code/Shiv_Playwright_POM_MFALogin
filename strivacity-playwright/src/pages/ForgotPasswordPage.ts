@@ -1,14 +1,14 @@
-import { Locator } from '@playwright/test';
-import { locators } from '../locators/locators';
-import { BasePage } from './BasePage';
+import { Locator, Page } from '@playwright/test';
 
-const L = locators.forgotPassword;
+export class ForgotPasswordPage {
+  constructor(private readonly page: Page) {}
 
-export class ForgotPasswordPage extends BasePage {
-  get confirmation(): Locator { return this.loc(L.confirmation); }
+  get confirmation(): Locator {
+    return this.page.getByText(/check your (e-?mail|inbox)|we('ve| have) sent|instructions/i);
+  }
 
   async requestReset(identifier: string): Promise<void> {
-    await this.loc(L.identifier).fill(identifier);
-    await this.loc(L.submit).click();
+    await this.page.getByRole('textbox', { name: /email|username/i }).fill(identifier);
+    await this.page.getByRole('button', { name: /send|continue|reset|submit/i }).click();
   }
 }

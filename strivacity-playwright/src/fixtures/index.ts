@@ -122,14 +122,27 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     await context.close();
   },
 
-  loginPage: async ({ page }, use) => { await use(new LoginPage(page)); },
-  mfaPage: async ({ page }, use) => { await use(new MfaPage(page)); },
-  forgotPasswordPage: async ({ page }, use) => { await use(new ForgotPasswordPage(page)); },
-  forgotUserIdPage: async ({ page }, use) => { await use(new ForgotUserIdPage(page)); },
-  resetPasswordPage: async ({ page }, use) => { await use(new ResetPasswordPage(page)); },
-  appPage: async ({ page }, use) => { await use(new AppPage(page)); },
+  loginPage: async ({ page }, use) => { 
+    await use(new LoginPage(page)); 
+  },
+  mfaPage: async ({ page }, use) => { 
+    await use(new MfaPage(page)); 
+  },
+  forgotPasswordPage: async ({ page }, use) => { 
+    await use(new ForgotPasswordPage(page)); 
+  },
+  forgotUserIdPage: async ({ page }, use) => {
+     await use(new ForgotUserIdPage(page)); 
+    },
+  resetPasswordPage: async ({ page }, use) => { 
+    await use(new ResetPasswordPage(page)); 
+  },
+  appPage: async ({ page }, use) => { 
+    await use(new AppPage(page)); },
 
-  auth: async ({ loginPage, mfaPage, mail }, use) => { await use(new AuthFlow(loginPage, mfaPage, mail)); },
+  auth: async ({ loginPage, mfaPage, mail }, use) => {
+     await use(new AuthFlow(loginPage, mfaPage, mail)); 
+    },
 
   userFactory: async ({ admin, mail }, use) => {
     const factory = new UserFactory(admin, mail);

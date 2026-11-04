@@ -1,20 +1,18 @@
-import { Locator } from '@playwright/test';
-import { locators } from '../locators/locators';
-import { BasePage } from './BasePage';
+import { Locator, Page } from '@playwright/test';
 
-const L = locators.mfa;
+export class MfaPage {
+  constructor(private readonly page: Page) {}
 
-export class MfaPage extends BasePage {
-  get errorMessage(): Locator { return this.loc(L.errorMessage); }
-  get codeInput(): Locator { return this.loc(L.codeInput); }
+  get errorMessage(): Locator { return this.page.getByRole('alert'); }
+  get codeInput(): Locator { return this.page.getByRole('textbox', { name: /code/i }); }
 
   async submitCode(code: string): Promise<void> {
-    await this.loc(L.codeInput).fill(code);
-    await this.loc(L.verifyButton).click();
+    await this.codeInput.fill(code);
+    await this.page.getByRole('button', { name: /verify|continue|submit/i }).click();
   }
 
   async resend(): Promise<void> {
-    await this.loc(L.resend).click();
+    await this.page.getByRole('button', { name: /resend/i }).click();
   }
 
   /**
@@ -22,13 +20,15 @@ export class MfaPage extends BasePage {
    * (Strivacity's Admin API cannot create TOTP authenticators, so enrollment is done once through the UI.)
    */
   async enrollTotp(): Promise<string> {
-    const choose = this.loc(L.chooseTotp);
+    const choose = this.page.getByRole('button', { name: /authenticator app|totp/i });
     const chooserShown = await choose.waitFor({ state: 'visible', timeout: 3_000 }).then(() => true, () => false);
     if (chooserShown) await choose.click();
 
-    await this.loc(L.manualEntry).click();
-    const secret = (await this.loc(L.totpSecret).textContent())?.trim();
-    if (!secret) throw new Error('TOTP secret not found. Update locators.mfa.totpSecret.');
+    await this.page.getByRole('button', { name: /can.?t scan|enter .*manually|manual/i }).click();
+    const secret = (await this.totpSecret.textContent())?.trim();
+    if (!secret) throw new Error('TOTP secret not found. Update MfaPage.totpSecret.');
     return secret;
   }
+
+  private get totpSecret(): Locator { return this.page.getByTestId('totp-secret'); }
 }
