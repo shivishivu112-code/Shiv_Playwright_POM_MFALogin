@@ -1,0 +1,26 @@
+{
+  "name": "strivacity-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reusable API+UI hybrid Playwright framework for CIAM/IdP testing (Strivacity first; Okta/Ping pluggable)",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:slow": "playwright test --grep @slow",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "install:browsers": "playwright install --with-deps chromium"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "mailosaur": "^8.8.0",
+    "otpauth": "^9.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
